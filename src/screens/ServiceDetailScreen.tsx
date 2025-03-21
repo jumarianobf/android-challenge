@@ -4,7 +4,7 @@ import { useRoute, useNavigation, type RouteProp } from "@react-navigation/nativ
 import type { StackNavigationProp } from "@react-navigation/stack"
 import type { Service } from "../types/types"
 
-// Define route param type directly in this file
+
 type ServiceDetailRouteParams = {
   ServiceDetail: {
     service: Service

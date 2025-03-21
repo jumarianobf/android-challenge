@@ -11,7 +11,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRoute, RouteProp } from '@react-navigation/native';
 import { Clinic } from '../types/types';
 
-// Define route param type directly in this file
+
 type ClinicDetailRouteParams = {
   ClinicDetail: {
     clinic: Clinic;

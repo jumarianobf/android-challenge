@@ -14,7 +14,7 @@ import { Dentist } from '../types/types';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
-// Define navigation types directly in this file
+
 type DentistStackParamList = {
   DentistList: undefined;
   DentistDetail: { dentist: Dentist };

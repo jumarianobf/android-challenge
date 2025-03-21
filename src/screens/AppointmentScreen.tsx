@@ -30,7 +30,6 @@ const AppointmentScreen = () => {
   const [appointments, setAppointments] = useState<Appointment[]>([])
   const [viewMode, setViewMode] = useState(dentist ? "booking" : "list")
 
-  // Generate dates for the next 7 days
   const generateDates = () => {
     const dates = []
     const today = new Date()
@@ -53,7 +52,6 @@ const AppointmentScreen = () => {
     return dates
   }
 
-  // Generate time slots
   const generateTimeSlots = () => {
     const slots = []
     const startHour = 8
@@ -61,7 +59,6 @@ const AppointmentScreen = () => {
 
     for (let hour = startHour; hour <= endHour; hour++) {
       if (hour !== 12) {
-        // Skip lunch hour
         slots.push(`${hour}:00`)
         if (hour !== endHour) {
           slots.push(`${hour}:30`)
@@ -77,7 +74,7 @@ const AppointmentScreen = () => {
 
   const handleDateSelect = (date: string) => {
     setSelectedDate(date)
-    setSelectedTime(null) // Reset time when date changes
+    setSelectedTime(null) 
   }
 
   const handleTimeSelect = (time: string) => {
@@ -104,7 +101,6 @@ const AppointmentScreen = () => {
         {
           text: "OK",
           onPress: () => {
-            // Navigate back to the previous screen or to the appointments list
             navigation.goBack()
           },
         },
@@ -196,7 +192,6 @@ const AppointmentScreen = () => {
       </ScrollView>
     )
   } else {
-    // Appointments list view
     return (
       <View style={styles.container}>
         <View style={styles.header}>

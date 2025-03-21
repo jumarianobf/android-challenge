@@ -11,7 +11,7 @@ type UserContextType = {
 
 const UserContext = createContext<UserContextType>({
   user: null,
-  setUser: () => {}, // Idealmente, você pode usar um tipo mais específico para não ter uma função vazia
+  setUser: () => {},
   isLoggedIn: false,
 })
 

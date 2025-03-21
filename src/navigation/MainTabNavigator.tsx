@@ -14,7 +14,6 @@ import UserScreen from '../screens/UserScreen';
 import UserDetailScreen from '../screens/UserDetailScreen';
 import { Dentist, User, Clinic, Service } from '../types/types';
 
-// Define the param lists for each stack navigator
 type DentistStackParamList = {
   DentistList: undefined;
   DentistDetail: { dentist: Dentist };
@@ -36,7 +35,6 @@ type UserStackParamList = {
   UserDetail: { user: User };
 };
 
-// Define the tab navigator param list
 type MainTabParamList = {
   Profile: undefined;
   Dentists: undefined;

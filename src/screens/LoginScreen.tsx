@@ -35,7 +35,6 @@ const LoginScreen = () => {
 
     setLoading(true)
     try {
-      // For demo purposes, any password works with a valid CPF from mock data
       const user = await loginUser(cpf, password)
 
       if (user) {
@@ -50,7 +49,6 @@ const LoginScreen = () => {
     }
   }
 
-  // For demo purposes, provide a quick login option
   const handleQuickLogin = async () => {
     setCpf("123.456.789-00")
     setPassword("senha123")
@@ -66,10 +64,8 @@ const LoginScreen = () => {
   }
 
   const formatCPF = (text: string) => {
-    // Remove non-numeric characters
     const cleaned = text.replace(/\D/g, "")
 
-    // Format as CPF: XXX.XXX.XXX-XX
     let formatted = cleaned
     if (cleaned.length > 9) {
       formatted = `${cleaned.slice(0, 3)}.${cleaned.slice(3, 6)}.${cleaned.slice(6, 9)}-${cleaned.slice(9, 11)}`

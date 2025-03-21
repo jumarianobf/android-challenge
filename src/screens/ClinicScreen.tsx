@@ -14,7 +14,7 @@ import { Clinic } from '../types/types';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
-// Define navigation types directly in this file
+
 type ClinicStackParamList = {
   ClinicList: undefined;
   ClinicDetail: { clinic: Clinic };
