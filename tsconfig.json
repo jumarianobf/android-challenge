@@ -1,6 +1,10 @@
 {
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
-    "strict": true
+    "strict": true,
+    "baseUrl": ".",  // Definindo a raiz do projeto como base
+    "paths": {
+      "@/*": ["src/*"]  // Alias '@' apontando para o diretório 'src'
+    }
   }
 }
