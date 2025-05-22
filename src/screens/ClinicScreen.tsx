@@ -1,19 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  StyleSheet, 
-  View, 
-  Text, 
-  FlatList, 
-  TouchableOpacity, 
-  ActivityIndicator,
-  TextInput
+import {
+  StyleSheet, View, Text, FlatList, TouchableOpacity, ActivityIndicator, TextInput,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { getClinics } from '../services/mockData';
-import { Clinic } from '../types/types';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-
+import { clinicService, Clinic } from '../services/clinicService';
 
 type ClinicStackParamList = {
   ClinicList: undefined;
@@ -29,20 +21,21 @@ const ClinicScreen = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const navigation = useNavigation<ClinicScreenNavigationProp>();
 
-  useEffect(() => {
-    const fetchClinics = async () => {
-      try {
-        const data = await getClinics();
-        setClinics(data);
-        setFilteredClinics(data);
-      } catch (error) {
-        console.error('Error fetching clinics:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const loadClinics = async () => {
+    try {
+      setLoading(true);
+      const data = await clinicService.getAll();
+      setClinics(data);
+      setFilteredClinics(data);
+    } catch (error) {
+      console.error('Erro ao carregar clínicas:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchClinics();
+  useEffect(() => {
+    loadClinics();
   }, []);
 
   useEffect(() => {
@@ -50,9 +43,9 @@ const ClinicScreen = () => {
       setFilteredClinics(clinics);
     } else {
       const filtered = clinics.filter(
-        clinic => 
-          clinic.nome_clinica.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          clinic.endereco.toLowerCase().includes(searchQuery.toLowerCase())
+        (clinic) =>
+          clinic.nomeClinica.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          clinic.endereco.toLowerCase().includes(searchQuery.toLowerCase()),
       );
       setFilteredClinics(filtered);
     }
@@ -62,31 +55,33 @@ const ClinicScreen = () => {
     navigation.navigate('ClinicDetail', { clinic });
   };
 
-  const renderClinicItem = ({ item }: { item: Clinic }) => (
-    <TouchableOpacity 
-      style={styles.clinicCard}
-      onPress={() => handleClinicPress(item)}
-    >
+  const renderClinicItem = ({ item }: { item: Clinic }) => {
+  const enderecoFormatado = item.enderecos.length > 0
+    ? `${item.enderecos[0].logradouroClinica}, ${item.enderecos[0].bairroClinica}, ${item.enderecos[0].cidadeClinica} - ${item.enderecos[0].estadoClinica}`
+    : 'Endereço não cadastrado';
+
+  return (
+    <TouchableOpacity style={styles.clinicCard} onPress={() => handleClinicPress(item)}>
       <View style={styles.clinicInfo}>
-        <Text style={styles.clinicName}>{item.nome_clinica}</Text>
+        <Text style={styles.clinicName}>{item.nomeClinica}</Text>
+
         <View style={styles.addressRow}>
           <Ionicons name="location-outline" size={16} color="#666" />
-          <Text style={styles.addressText}>{item.endereco}</Text>
+          <Text style={styles.addressText}>{enderecoFormatado}</Text>
         </View>
+
         <View style={styles.contactRow}>
           <Ionicons name="call-outline" size={16} color="#666" />
-          <Text style={styles.contactText}>{item.telefone}</Text>
-        </View>
-        <View style={styles.hoursRow}>
-          <Ionicons name="time-outline" size={16} color="#666" />
-          <Text style={styles.hoursText}>{item.horario_funcionamento}</Text>
+          <Text style={styles.contactText}>{item.telefoneClinica || 'Não informado'}</Text>
         </View>
       </View>
+
       <View style={styles.arrowContainer}>
         <Ionicons name="chevron-forward" size={20} color="#0066cc" />
       </View>
     </TouchableOpacity>
   );
+};
 
   return (
     <View style={styles.container}>
@@ -114,7 +109,7 @@ const ClinicScreen = () => {
         <FlatList
           data={filteredClinics}
           renderItem={renderClinicItem}
-          keyExtractor={(item) => item.clinica_id}
+          keyExtractor={(item) => item.clinicaId.toString()}
           contentContainerStyle={styles.listContainer}
         />
       ) : (

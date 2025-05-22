@@ -1,19 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  StyleSheet, 
-  View, 
-  Text, 
-  FlatList, 
-  TouchableOpacity, 
-  ActivityIndicator, 
-  TextInput 
+import {
+  StyleSheet, View, Text, FlatList, TouchableOpacity,
+  ActivityIndicator, TextInput,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { getDentists } from '../services/mockData';
-import { Dentist } from '../types/types';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-
+import { Dentist } from '../types/types';
+import { dentistService } from '../services/dentistService';
 
 type DentistStackParamList = {
   DentistList: undefined;
@@ -30,20 +24,21 @@ const DentistListScreen = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const navigation = useNavigation<DentistListScreenNavigationProp>();
 
-  useEffect(() => {
-    const fetchDentists = async () => {
-      try {
-        const data = await getDentists();
-        setDentists(data);
-        setFilteredDentists(data);
-      } catch (error) {
-        console.error('Error fetching dentists:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const loadDentists = async () => {
+    try {
+      setLoading(true);
+      const data = await dentistService.getAll();
+      setDentists(data);
+      setFilteredDentists(data);
+    } catch (error) {
+      console.error('Erro ao carregar dentistas:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchDentists();
+  useEffect(() => {
+    loadDentists();
   }, []);
 
   useEffect(() => {
@@ -52,8 +47,8 @@ const DentistListScreen = () => {
     } else {
       const filtered = dentists.filter(
         (dentist) =>
-          dentist.nome_dentista.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          dentist.especialidade.toLowerCase().includes(searchQuery.toLowerCase())
+          dentist.nomeDentista.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          dentist.especialidade.toLowerCase().includes(searchQuery.toLowerCase()),
       );
       setFilteredDentists(filtered);
     }
@@ -66,15 +61,15 @@ const DentistListScreen = () => {
   const renderDentistItem = ({ item }: { item: Dentist }) => (
     <TouchableOpacity style={styles.dentistCard} onPress={() => handleDentistPress(item)}>
       <View style={styles.dentistInfo}>
-        <Text style={styles.dentistName}>{item.nome_dentista}</Text>
+        <Text style={styles.dentistName}>{item.nomeDentista}</Text>
         <Text style={styles.dentistSpecialty}>{item.especialidade}</Text>
         <View style={styles.contactRow}>
           <Ionicons name="call-outline" size={14} color="#666" />
-          <Text style={styles.contactText}>{item.telefone_dentista}</Text>
+          <Text style={styles.contactText}>{item.telefoneDentista || 'Não informado'}</Text>
         </View>
         <View style={styles.contactRow}>
           <Ionicons name="mail-outline" size={14} color="#666" />
-          <Text style={styles.contactText}>{item.email_dentista}</Text>
+          <Text style={styles.contactText}>{item.emailDentista || 'Não informado'}</Text>
         </View>
       </View>
       <View style={styles.arrowContainer}>
@@ -109,9 +104,9 @@ const DentistListScreen = () => {
         <FlatList
           data={filteredDentists}
           renderItem={renderDentistItem}
-          keyExtractor={(item) => item.dentista_id}
-          contentContainerStyle={styles.listContainer}
+          keyExtractor={(item) => item.dentistaId?.toString() ?? Math.random().toString()}
         />
+
       ) : (
         <View style={styles.emptyContainer}>
           <Ionicons name="search-outline" size={50} color="#ccc" />

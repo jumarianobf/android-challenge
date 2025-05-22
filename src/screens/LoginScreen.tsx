@@ -13,12 +13,12 @@ import {
   Alert,
 } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
-import { loginUser } from "../services/mockData"
-import { useUser } from "@/context/UserContext"
+import { userService } from "../services/userService"
+import React from "react"
+import { useUser } from "../context/UserContext"
 
 const LoginScreen = () => {
   const [cpf, setCpf] = useState("")
-  const [password, setPassword] = useState("")
   const [loading, setLoading] = useState(false)
   const { setUser } = useUser()
 
@@ -28,19 +28,14 @@ const LoginScreen = () => {
       return
     }
 
-    if (!password.trim()) {
-      Alert.alert("Erro", "Por favor, informe sua senha")
-      return
-    }
-
     setLoading(true)
     try {
-      const user = await loginUser(cpf, password)
-
+      const user = await userService.getByCpf(cpf)
+      
       if (user) {
         setUser(user)
       } else {
-        Alert.alert("Erro", "CPF não encontrado ou senha incorreta")
+        Alert.alert("Erro", "CPF não encontrado")
       }
     } catch (error) {
       Alert.alert("Erro", "Ocorreu um erro ao fazer login")
@@ -49,23 +44,8 @@ const LoginScreen = () => {
     }
   }
 
-  const handleQuickLogin = async () => {
-    setCpf("123.456.789-00")
-    setPassword("senha123")
-    setLoading(true)
-
-    setTimeout(async () => {
-      const user = await loginUser("123.456.789-00", "senha123")
-      if (user) {
-        setUser(user)
-      }
-      setLoading(false)
-    }, 1000)
-  }
-
   const formatCPF = (text: string) => {
     const cleaned = text.replace(/\D/g, "")
-
     let formatted = cleaned
     if (cleaned.length > 9) {
       formatted = `${cleaned.slice(0, 3)}.${cleaned.slice(3, 6)}.${cleaned.slice(6, 9)}-${cleaned.slice(9, 11)}`
@@ -74,7 +54,6 @@ const LoginScreen = () => {
     } else if (cleaned.length > 3) {
       formatted = `${cleaned.slice(0, 3)}.${cleaned.slice(3)}`
     }
-
     return formatted
   }
 
@@ -97,21 +76,8 @@ const LoginScreen = () => {
             maxLength={14}
           />
 
-          <Text style={styles.label}>Senha</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Digite sua senha"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-          />
-
           <TouchableOpacity style={styles.loginButton} onPress={handleLogin} disabled={loading}>
             {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.loginButtonText}>Entrar</Text>}
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.quickLoginButton} onPress={handleQuickLogin} disabled={loading}>
-            <Text style={styles.quickLoginText}>Login Rápido (Demo)</Text>
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
@@ -182,15 +148,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
   },
-  quickLoginButton: {
-    marginTop: 15,
-    alignItems: "center",
-  },
-  quickLoginText: {
-    color: "#0066cc",
-    fontSize: 14,
-  },
 })
 
 export default LoginScreen
-

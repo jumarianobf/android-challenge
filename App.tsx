@@ -2,9 +2,8 @@ import { StatusBar } from "expo-status-bar"
 import { SafeAreaProvider } from "react-native-safe-area-context"
 import { NavigationContainer } from "@react-navigation/native"
 import AppNavigator from "./src/navigation/AppNavigator"
-import { UserProvider } from "@/context/UserContext"
-
-
+import { UserProvider } from "./src/context/UserContext";
+import React from "react";
 
 
 export default function App() {

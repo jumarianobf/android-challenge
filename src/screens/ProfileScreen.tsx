@@ -1,56 +1,74 @@
-"use client"
-import { StyleSheet, View, Text, TouchableOpacity, ScrollView, Alert, ActivityIndicator } from "react-native"
-import { SafeAreaView } from "react-native-safe-area-context"
-import { Ionicons } from "@expo/vector-icons"
-import { getUserAppointments } from "../services/mockData"
-import { useState, useEffect } from "react"
-import type { Appointment } from "../types/types"
-import { useUser } from "@/context/UserContext"
+"use client";
+
+import React, { useState, useEffect } from "react";
+import {
+  StyleSheet,
+  View,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+  Alert,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Ionicons } from "@expo/vector-icons";
+import { useUser } from "../context/UserContext";
+import { useNavigation } from "@react-navigation/native";
+import { StackNavigationProp } from "@react-navigation/stack";
+import { Atendimento } from "../types/types";
+import { atendimentoService } from "../services/atendimentoService";
+
+// Tipagem das rotas
+type ProfileStackParamList = {
+  ProfileMain: undefined;
+  Atendimento: undefined;
+};
+
+type ProfileScreenNavigationProp = StackNavigationProp<
+  ProfileStackParamList,
+  "ProfileMain"
+>;
 
 const ProfileScreen = () => {
-  const { user, setUser } = useUser()
-  const [appointments, setAppointments] = useState<Appointment[]>([])
-  const [loading, setLoading] = useState(true)
+  const { user, setUser } = useUser();
+  const [appointments, setAppointments] = useState<Atendimento[]>([]);
+  const [loading, setLoading] = useState(true);
+  const navigation = useNavigation<ProfileScreenNavigationProp>();
 
   useEffect(() => {
     const fetchAppointments = async () => {
       if (user) {
         try {
-          const userAppointments = await getUserAppointments(user.usuario_id)
-          setAppointments(userAppointments)
+          const response = await atendimentoService.getAll(user.usuarioId);
+          setAppointments(response);
         } catch (error) {
-          console.error("Error fetching appointments:", error)
-          Alert.alert("Error", "Could not fetch appointments. Please try again.")
+          console.error("Erro ao carregar atendimentos:", error);
+          Alert.alert("Erro", "Não foi possível carregar suas consultas.");
         } finally {
-          setLoading(false)
+          setLoading(false);
         }
       }
-    }
+    };
 
-    fetchAppointments()
-  }, [user])
+    fetchAppointments();
+  }, [user]);
 
   const handleLogout = () => {
     Alert.alert("Sair", "Tem certeza que deseja sair?", [
-      {
-        text: "Cancelar",
-        style: "cancel",
-      },
-      {
-        text: "Sim",
-        onPress: () => setUser(null),
-      },
-    ])
-  }
+      { text: "Cancelar", style: "cancel" },
+      { text: "Sair", onPress: () => setUser(null) },
+    ]);
+  };
 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString)
-    return date.toLocaleDateString("pt-BR")
-  }
+    const date = new Date(dateString);
+    return date.toLocaleDateString("pt-BR");
+  };
 
-  if (!user) {
-    return null
-  }
+  const handleViewAllAppointments = () => {
+    navigation.navigate("Atendimento");
+  };
+
+  if (!user) return null;
 
   return (
     <SafeAreaView style={styles.container}>
@@ -72,7 +90,9 @@ const ProfileScreen = () => {
             <Ionicons name="calendar-outline" size={20} color="#666" />
             <View style={styles.infoContent}>
               <Text style={styles.infoLabel}>Data de Nascimento</Text>
-              <Text style={styles.infoValue}>{formatDate(user.data_nascimento)}</Text>
+              <Text style={styles.infoValue}>
+                {formatDate(user.dataNascimento)}
+              </Text>
             </View>
           </View>
 
@@ -80,7 +100,9 @@ const ProfileScreen = () => {
             <Ionicons name="person-outline" size={20} color="#666" />
             <View style={styles.infoContent}>
               <Text style={styles.infoLabel}>Gênero</Text>
-              <Text style={styles.infoValue}>{user.genero === "M" ? "Masculino" : "Feminino"}</Text>
+              <Text style={styles.infoValue}>
+                {user.genero === "M" ? "Masculino" : "Feminino"}
+              </Text>
             </View>
           </View>
 
@@ -88,46 +110,90 @@ const ProfileScreen = () => {
             <Ionicons name="time-outline" size={20} color="#666" />
             <View style={styles.infoContent}>
               <Text style={styles.infoLabel}>Cliente desde</Text>
-              <Text style={styles.infoValue}>{formatDate(user.data_cadastro)}</Text>
+              <Text style={styles.infoValue}>
+                {formatDate(user.dataCadastro)}
+              </Text>
             </View>
           </View>
         </View>
 
         <View style={styles.appointmentsSection}>
-          <Text style={styles.sectionTitle}>Consultas Recentes</Text>
+          <View style={styles.appointmentHeader}>
+            <Text style={styles.sectionTitle}>Consultas Recentes</Text>
+            <TouchableOpacity onPress={handleViewAllAppointments}>
+              <Text style={styles.viewAllText}>Ver todas</Text>
+            </TouchableOpacity>
+          </View>
 
           {loading ? (
             <Text style={styles.loadingText}>Carregando consultas...</Text>
-          ) : appointments.length > 0 ? (
-            appointments.map((appointment) => (
-              <View key={appointment.id} style={styles.appointmentCard}>
-                <View style={styles.appointmentHeader}>
-                  <Text style={styles.appointmentDate}>
-                    {formatDate(appointment.data)} às {appointment.horario}
-                  </Text>
-                  <View
-                    style={[
-                      styles.statusBadge,
-                      appointment.status === "agendado"
-                        ? styles.statusScheduled
-                        : appointment.status === "concluido"
+          ) : Array.isArray(appointments) && appointments.length > 0 ? (
+            [...appointments]
+              .sort(
+                (a, b) =>
+                  new Date(b.dataAtendimento).getTime() -
+                  new Date(a.dataAtendimento).getTime()
+              )
+              .slice(0, 1)
+              .map((appointment) => (
+                <View
+                  key={appointment.atendimentoId}
+                  style={styles.appointmentCard}
+                >
+                  <View style={styles.appointmentHeader}>
+                    <Text style={styles.appointmentDate}>
+                      {formatDate(appointment.dataAtendimento)}
+                    </Text>
+                    <View
+                      style={[
+                        styles.statusBadge,
+                        appointment.status === "agendado"
+                          ? styles.statusScheduled
+                          : appointment.status === "concluido"
                           ? styles.statusCompleted
                           : styles.statusCanceled,
-                    ]}
-                  >
-                    <Text style={styles.statusText}>
-                      {appointment.status === "agendado"
-                        ? "Agendado"
-                        : appointment.status === "concluido"
+                      ]}
+                    >
+                      <Text style={styles.statusText}>
+                        {appointment.status === "Concluído"
+                          ? "Agendado"
+                          : appointment.status === "concluido"
                           ? "Concluído"
-                          : "Cancelado"}
+                          : "Concluído"}
+                      </Text>
+                    </View>
+                  </View>
+
+                  <View style={styles.infoRow}>
+                    <Ionicons name="business-outline" size={16} color="#666" />
+                    <Text style={styles.infoValue}>
+                      Clínica: {appointment.clinica.nomeClinica}
+                    </Text>
+                  </View>
+
+                  <View style={styles.infoRow}>
+                    <Ionicons name="person-outline" size={16} color="#666" />
+                    <Text style={styles.infoValue}>
+                      Dentista: {appointment.dentista.nomeDentista}
+                    </Text>
+                  </View>
+
+                  <View style={styles.infoRow}>
+                    <Ionicons
+                      name="information-circle-outline"
+                      size={16}
+                      color="#666"
+                    />
+                    <Text style={styles.infoValue}>
+                      {appointment.descricaoProcedimento}
                     </Text>
                   </View>
                 </View>
-              </View>
-            ))
+              ))
           ) : (
-            <Text style={styles.noAppointmentsText}>Nenhuma consulta encontrada</Text>
+            <Text style={styles.noAppointmentsText}>
+              Nenhuma consulta encontrada
+            </Text>
           )}
         </View>
 
@@ -137,14 +203,11 @@ const ProfileScreen = () => {
         </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#f5f5f5",
-  },
+  container: { flex: 1, backgroundColor: "#f5f5f5" },
   header: {
     backgroundColor: "#0066cc",
     padding: 20,
@@ -202,10 +265,7 @@ const styles = StyleSheet.create({
     marginLeft: 15,
     flex: 1,
   },
-  infoLabel: {
-    fontSize: 14,
-    color: "#666",
-  },
+  infoLabel: { fontSize: 14, color: "#666" },
   infoValue: {
     fontSize: 16,
     color: "#333",
@@ -221,6 +281,17 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 2,
     elevation: 2,
+  },
+  appointmentHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  viewAllText: {
+    color: "#0066cc",
+    fontSize: 14,
+    fontWeight: "500",
   },
   loadingText: {
     textAlign: "center",
@@ -239,11 +310,6 @@ const styles = StyleSheet.create({
     padding: 15,
     marginBottom: 10,
   },
-  appointmentHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
   appointmentDate: {
     fontSize: 16,
     fontWeight: "500",
@@ -254,19 +320,10 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     borderRadius: 15,
   },
-  statusScheduled: {
-    backgroundColor: "#e6f7ff",
-  },
-  statusCompleted: {
-    backgroundColor: "#e6fff0",
-  },
-  statusCanceled: {
-    backgroundColor: "#ffe6e6",
-  },
-  statusText: {
-    fontSize: 12,
-    fontWeight: "600",
-  },
+  statusScheduled: { backgroundColor: "#e6f7ff" },
+  statusCompleted: { backgroundColor: "#e6fff0" },
+  statusCanceled: { backgroundColor: "#e6fff0" },
+  statusText: { fontSize: 12, fontWeight: "600" },
   logoutButton: {
     backgroundColor: "#ff3b30",
     flexDirection: "row",
@@ -281,7 +338,6 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     marginLeft: 8,
   },
-})
+});
 
-export default ProfileScreen
-
+export default ProfileScreen;

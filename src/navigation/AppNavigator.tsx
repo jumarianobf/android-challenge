@@ -1,12 +1,14 @@
-import { createStackNavigator } from "@react-navigation/stack"
-import AuthNavigator from "./AuthNavigator"
-import MainTabNavigator from "./MainTabNavigator"
-import { useUser, } from "../context/UserContext"
+import React from "react";
+import { createStackNavigator } from "@react-navigation/stack";
+import AuthNavigator from "./AuthNavigator";
+import MainTabNavigator from "./MainTabNavigator";
+import { useUser } from "../context/UserContext";
 
-const Stack = createStackNavigator()
+const Stack = createStackNavigator();
 
 const AppNavigator = () => {
-  const { isLoggedIn } = useUser()
+  const { user } = useUser();
+  const isLoggedIn = !!user;
 
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
@@ -16,8 +18,7 @@ const AppNavigator = () => {
         <Stack.Screen name="Auth" component={AuthNavigator} />
       )}
     </Stack.Navigator>
-  )
-}
+  );
+};
 
-export default AppNavigator
-
+export default AppNavigator;

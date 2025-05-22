@@ -1,5 +1,16 @@
 module.exports = {
-    presets: ['babel-preset-expo'], // Usando o preset do Expo
-    plugins: ['react-native-reanimated/plugin'], // Plugin necessário para o React Native Reanimated
-  };
-  
+  presets: ['babel-preset-expo'],
+  plugins: [
+    [
+      'module-resolver',
+      {
+        root: ['./src'],
+        alias: {
+          '@': './src',
+        },
+        extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
+      },
+    ],
+    'react-native-reanimated/plugin', // ⚠️ Sempre o último
+  ],
+};
