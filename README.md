@@ -1,122 +1,92 @@
 
-# 🦷 Parrot Tech — Backend API
+# 🦷 Parrot Tech - Mobile
 
-API REST para gerenciamento odontológico, desenvolvida em Spring Boot, responsável por gerenciar dados de usuários, atendimentos, clínicas, dentistas e imagens.
+## ✅ Descrição
 
----
+Aplicativo mobile desenvolvido para gerenciamento de atendimentos odontológicos, utilizando React Native com Expo.
 
-## 👥 **Integrantes do Grupo**
-
-- **Julia Mariano Barsotti Ferreira - RM552713**
-- **Leonardo Gaspar Saheb - RM553383**
-- **Caio Eduardo Nascimento Martins - RM554025**
+> ⚠️ **Atenção:** Este aplicativo **necessita do backend rodando** para funcionar corretamente. O backend está disponível no repositório:  
+👉 [Link do Backend](https://github.com/jumarianobf/Backend-mobile)
 
 ---
 
-## 🔗 **Frontend (Mobile App)**
+## 👥 Integrantes do Grupo
 
-O app mobile que consome esta API está disponível em:  
-👉 [parrot-tech-app](https://github.com/seu-user/parrot-tech-app)
-
----
-
-## 🏗️ **Tecnologias Utilizadas**
-
-- Java 17
-- Spring Boot
-- Spring Data JPA
-- Spring Security (JWT)
-- Lombok
-- PostgreSQL ou Oracle (dependendo da configuração)
-- Upload de Imagens (via API REST)
-- RabbitMQ (Mensageria)
-- Framework Spring AI (AzureOpenAiChatModel)
+- **Julia Mariano Barsotti Ferreira - RM552713**  
+- **Leonardo Gaspar Saheb - RM553383**  
+- **Caio Eduardo Nascimento Martins - RM554025**  
 
 ---
 
-## 🗺️ **Diagrama da Solução**
+## 🗺️ Diagramas
 
-🔗 [Acesse o diagrama no Excalidraw](https://excalidraw.com/#json=3MFUGxGc3uiOip-2LvJ2p,RvmWaDGcUM_MzYEL-Yagxw)
-
----
-
-## 🚀 **Como Rodar o Projeto Backend**
-
-### ✅ Pré-requisitos
-
-- Java 17 instalado
-- Maven ou sua IDE (IntelliJ, Eclipse ou Spring Tool Suite)
-- Banco de dados rodando (PostgreSQL, Oracle ou H2)
-- RabbitMQ (se desejar testar mensageria)
+👉 [Link do Diagrama no Excalidraw](https://excalidraw.com/#json=3MFUGxGc3uiOip-2LvJ2p,RvmWaDGcUM_MzYEL-Yagxw)
 
 ---
 
-### 🔧 Passos para executar:
+## 🚀 Tecnologias Utilizadas
 
-1. Clone o projeto:
+- React Native
+- Expo
+- Axios
+- TypeScript
+- API REST (Backend Spring Boot)
+- Context API para autenticação
+
+---
+
+## 🏗️ Pré-requisitos
+
+- Node.js instalado
+- Expo CLI instalado globalmente (`npm install -g expo-cli`)
+- Backend rodando localmente ou hospedado
+
+---
+
+## 💻 Como rodar o projeto
+
+1. **Clone o repositório:**
 ```bash
-git clone https://github.com/seu-user/parrot-tech-backend.git
+git clone https://github.com/seu-usuario/seu-repositorio-mobile.git
 ```
 
-2. Acesse a pasta:
+2. **Entre na pasta do projeto:**
 ```bash
-cd parrot-tech-backend
+cd challenge-java-master-mobile
 ```
 
-3. Configure o banco de dados em:
-```plaintext
-src/main/resources/application.properties
-```
-Exemplo de configuração:
-```properties
-spring.datasource.url=jdbc:postgresql://localhost:5432/parrottech
-spring.datasource.username=seu_usuario
-spring.datasource.password=sua_senha
-spring.jpa.hibernate.ddl-auto=update
-```
-
-4. Execute o projeto:
-- ✅ Pela sua IDE: Rode a classe `ChallengeApplication.java`
-- ✅ Pelo terminal:
+3. **Instale as dependências:**
 ```bash
-./mvnw spring-boot:run
+npm install
+```
+
+4. **Inicie o Expo:**
+```bash
+npx expo start
+```
+
+5. **Aponte o aplicativo para o backend:**
+- Verifique e altere o IP no arquivo `/services/api.ts` para o IP local onde o backend está rodando.
+
+Exemplo:
+```ts
+const api = axios.create({
+  baseURL: 'http://192.168.xx.xx:8080/api'
+});
 ```
 
 ---
 
-## 🔗 **Endpoints principais da API**
+## ⚙️ Funcionalidades
 
-| Método | Endpoint                          | Descrição                         |
-|--------|------------------------------------|------------------------------------|
-| GET    | /api/usuarios                      | Listar usuários                   |
-| POST   | /api/usuarios                      | Criar usuário                     |
-| GET    | /api/atendimentos/usuario/{id}     | Listar atendimentos por usuário   |
-| POST   | /api/atendimentos/upload           | Criar atendimento com imagem      |
-| GET    | /api/imagens/usuario/{usuarioId}   | Listar imagens do usuário         |
-| POST   | /api/imagens/upload                | Upload de imagem para usuário     |
+- CRUD completo de Atendimentos
+- Upload de imagem no cadastro do atendimento
+- Feedback de erros e validações
+- Opção de **"Tentar Novamente"** em caso de falhas
+- Aplicação fluída e responsiva
 
 ---
 
-## 🧠 **Funcionalidades Implementadas**
+## 📜 Licença
 
-- ✅ CRUD completo de Usuários
-- ✅ CRUD completo de Clínicas
-- ✅ CRUD completo de Dentistas
-- ✅ CRUD completo de Atendimentos
-- ✅ Upload e gerenciamento de imagens
-- ✅ Mensageria com RabbitMQ (Logs de ações)
-- ✅ Autenticação com Spring Security (JWT)
-- ✅ Framework Spring AI (AzureOpenAiChatModel)
-
----
-
-## ⚠️ **Observação**
-
-- As imagens são armazenadas em uma pasta local `/uploads` na raiz do projeto.
-- Se quiser, pode integrar com serviços externos como AWS S3 no futuro.
-
----
-
-## 📜 **Licença**
-
-- 📝 Este projeto é de uso acadêmico — **FIAP (Faculdade de Informática e Administração Paulista)**.
+Projeto desenvolvido para fins acadêmicos na **FIAP** - 2024.
